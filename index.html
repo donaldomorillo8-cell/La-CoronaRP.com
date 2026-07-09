@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Corona Roleplay | Servidor Oficial</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #0b0202;
+            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        .red-glow {
+            text-shadow: 0 0 15px rgba(239, 68, 68, 0.7);
+        }
+        .red-border {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        /* Fondo con degrade simulando la estética del nuevo logo */
+        .bg-corona {
+            background: linear-gradient(180deg, #180303 0%, #0b0202 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-corona">
+
+    <!-- PANTALLA DE INICIO DE SESIÓN CON DISCORD -->
+    <div id="login-screen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full bg-[#140606] border red-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(239,68,68,0.15)]">
+            <!-- Nuevo Logo Dominicano -->
+            <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona Roleplay Logo" class="mx-auto w-56 h-56 object-cover rounded-xl mb-6 shadow-lg border-2 border-red-600">
+            
+            <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">LA CORONA <span class="text-red-500 red-glow">RP</span></h1>
+            <p class="text-gray-400 text-sm mb-8">Inicia sesión con tu cuenta de Discord para verificar tu identidad y acceder al panel de estadísticas en tiempo real.</p>
+            
+            <button onclick="redirectToDiscord()" class="w-full bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-200 shadow-lg transform hover:scale-[1.02]">
+                <i class="fab fa-discord text-xl"></i>
+                Iniciar Sesión Real con Discord
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL DE LA WEB (OCULTO POR DEFECTO) -->
+    <div id="main-content" class="hidden flex-grow flex flex-col">
+        <!-- Navbar -->
+        <header class="bg-[#120505] border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona Logo" class="w-10 h-10 rounded-lg object-cover border border-red-600">
+                <span class="text-white font-black tracking-widest text-lg">LA CORONA <span class="text-red-500">RP</span></span>
+            </div>
+            
+            <!-- Datos Reales del Perfil de Discord -->
+            <div class="flex items-center gap-3 bg-[#1c0a0a] px-4 py-2 rounded-full border border-red-900/40">
+                <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-red-500">
+                <span id="user-name" class="text-white font-semibold text-sm">Cargando...</span>
+                <button onclick="logout()" class="text-gray-400 hover:text-red-500 text-xs ml-2 transition-colors" title="Cerrar Sesión">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="relative py-16 px-6 text-center border-b border-red-950/20">
+            <div class="max-w-3xl mx-auto">
+                <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona" class="mx-auto w-44 h-44 object-cover rounded-2xl mb-6 shadow-2xl border-2 border-red-600">
+                <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¡Bienvenido al Bloque del <span class="text-red-500 red-glow">Mejor Rol</span>!</h2>
+                <p class="text-gray-300 text-base max-w-2xl mx-auto mb-8">Conéctate directamente al servidor con la comunidad activa más dura de MTA. Mapeos exclusivos, facciones reales y sistemas optimizados.</p>
+                
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="mtasa://172.83.152.207:2001" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2">
+                        <i class="fas fa-play"></i> ENTRAR AL SERVIDOR
+                    </a>
+                    <a href="https://discord.gg/ymtXMy34Fg" target="_blank" class="bg-[#5865F2] hover:bg-[#4752C4] text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2">
+                        <i class="fab fa-discord"></i> COMUNIDAD DE DISCORD
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Monitoreo en Tiempo Real -->
+        <main class="max-w-6xl w-full mx-auto px-6 py-12 flex-grow grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Tarjeta Estado de Servidor Real -->
+            <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs">Jugadores Conectados</h3>
+                        <span class="flex h-2.5 w-2.5 relative">
+                            <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                        </span>
+                    </div>
+                    <div class="flex items-baseline gap-2 mb-2">
+                        <span id="player-count" class="text-5xl font-black text-white">...</span>
+                        <span id="player-max" class="text-gray-500 font-medium text-lg">/ ...</span>
+                    </div>
+                    <p id="server-status-text" class="text-xs text-green-400 font-medium">Consultando servidor en vivo...</p>
+                </div>
+                <div class="w-full bg-neutral-900 h-2.5 rounded-full overflow-hidden mt-6">
+                    <div id="player-bar" class="bg-red-600 h-full transition-all duration-700" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Tarjeta IP Fija -->
+            <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
+                <div>
+                    <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs mb-4">Dirección IP de Conexión</h3>
+                    <p class="text-xl font-extrabold text-white tracking-wide mb-1 selection:bg-red-600">172.83.152.207</p>
+                    <p class="text-sm text-red-400 font-medium">Puerto de Red: 2001</p>
+                </div>
+                <button onclick="copyIP()" class="mt-6 w-full bg-[#1c0a0a] hover:bg-red-950/30 text-gray-200 font-bold py-3 px-4 rounded-xl border border-red-900/30 transition-all text-xs flex items-center justify-center gap-2 uppercase tracking-wider">
+                    <i class="far fa-copy"></i> Copiar Dirección IP
+                </button>
+            </div>
+
+            <!-- Características -->
+            <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 shadow-lg">
+                <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs mb-4">Nuestras Ventajas</h3>
+                <ul class="space-y-3.5 text-sm text-gray-300">
+                    <li class="flex items-center gap-2.5"><i class="fas fa-fire text-red-500"></i> Facciones 100% Personalizadas</li>
+                    <li class="flex items-center gap-2.5"><i class="fas fa-shield-alt text-red-500"></i> Anticheat y Seguridad Avanzada</li>
+                    <li class="flex items-center gap-2.5"><i class="fas fa-car text-red-500"></i> Vehículos y Mapeos de Alta Calidad</li>
+                    <li class="flex items-center gap-2.5"><i class="fas fa-users text-red-500"></i> Soporte rápido vía Discord</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-[#080202] text-center py-6 border-t border-red-950/30 text-xs text-gray-500">
+        <p>&copy; 2026 La Corona Roleplay. Conexión Estable de Red Directa.</p>
+    </footer>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN DE DISCORD OAUTH2 REAL
+        // ==========================================
+        const CLIENT_ID = 'TU_CLIENT_ID_DE_DISCORD_AQUI'; // <--- Pon aquí tu Client ID del portal de Discord
+        const REDIRECT_URI = window.location.href.split('#')[0]; 
+
+        function redirectToDiscord() {
+            const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
+            window.location.href = url;
+        }
+
+        // Procesamiento del Token Real que devuelve Discord
+        function checkDiscordAuth() {
+            const fragment = new URLSearchParams(window.location.hash.slice(1));
+            const accessToken = fragment.get('access_token');
+
+            if (accessToken) {
+                // Limpiar la URL para estética
+                window.location.hash = '';
+                localStorage.setItem('dc_access_token', accessToken);
+                fetchDiscordUserData(accessToken);
+            } else {
+                const savedToken = localStorage.getItem('dc_access_token');
+                if (savedToken) {
+                    fetchDiscordUserData(savedToken);
+                } else {
+                    showLogin();
+                }
+            }
+        }
+
+        function fetchDiscordUserData(token) {
+            fetch('https://discord.com/api/users/@me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Token expirado');
+                return res.json();
+            })
+            .then(user => {
+                document.getElementById('user-name').innerText = `${user.username}`;
+                if (user.avatar) {
+                    document.getElementById('user-avatar').src = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
+                } else {
+                    document.getElementById('user-avatar').src = 'https://cdn.discordapp.com/embed/avatars/0.png';
+                }
+                showMain();
+            })
+            .catch(err => {
+                console.error(err);
+                logout();
+            });
+        }
+
+        function showMain() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('dc_access_token');
+            showLogin();
+        }
+
+        // ==========================================
+        // CONEXIÓN EN TIEMPO REAL CON EL SERVIDOR MTA
+        // ==========================================
+        function fetchLiveServerPlayers() {
+            const ip = "172.83.152.207";
+            const port = "2001";
+            
+            // Usamos la API unificada de SA-MP/MTA de game-state externa
+            fetch(`https://api.game-state.com/v1/servers/${ip}:${port}`)
+                .then(response => {
+                    if (!response.ok) throw new Error();
+                    return response.json();
+                })
+                .then(data => {
+                    // Si el servidor responde correctamente con datos en vivo
+                    const online = data.players ? data.players : 0;
+                    const max = data.max_players ? data.max_players : 100;
+                    updateUIPlayers(online, max, true);
+                })
+                .catch(() => {
+                    // Fallback / Alternativa de consulta directa por si el rastreador de caché tarda en sincronizar
+                    fetch(`https://api.samp-servers.net/v1/server/${ip}:${port}`)
+                        .then(r => r.json())
+                        .then(d => {
+                            updateUIPlayers(d.players || 0, d.maxPlayers || 150, true);
+                        })
+                        .catch(() => {
+                            // En caso extremo de desconexión del host de la API, se muestra fuera de línea o 0 de forma limpia
+                            updateUIPlayers(0, 150, false);
+                        });
+                });
+        }
+
+        function updateUIPlayers(online, max, isOnline) {
+            const countEl = document.getElementById('player-count');
+            const maxEl = document.getElementById('player-max');
+            const barEl = document.getElementById('player-bar');
+            const textEl = document.getElementById('server-status-text');
+            const dot = document.getElementById('status-dot');
+            const ping = document.getElementById('status-ping');
+
+            if (isOnline) {
+                countEl.innerText = online;
+                maxEl.innerText = `/ ${max}`;
+                const pct = Math.min((online / max) * 100, 100);
+                barEl.style.width = pct + '%';
+                textEl.innerText = "Sincronizado con la Masterlist en vivo.";
+                textEl.className = "text-xs text-green-400 font-medium";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500";
+                ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
+            } else {
+                countEl.innerText = "0";
+                maxEl.innerText = "/ 150";
+                barEl.style.width = '0%';
+                textEl.innerText = "Servidor fuera de línea o cargando...";
+                textEl.className = "text-xs text-red-500 font-medium";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
+                ping.className = "absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-0";
+            }
+        }
+
+        function copyIP() {
+            const fullIP = "172.83.152.207:2001";
+            navigator.clipboard.writeText(fullIP).then(() => {
+                alert("¡IP Copiada exitosamente!: " + fullIP);
+            });
+        }
+
+        // Ejecución al iniciar
+        window.onload = function() {
+            checkDiscordAuth();
+            fetchLiveServerPlayers();
+            setInterval(fetchLiveServerPlayers, 20000); // Consulta real cada 20 segundos
+        };
+    </script>
+</body>
+</html>
