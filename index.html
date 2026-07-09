@@ -6,7 +6,7 @@
     <title>La Corona Roleplay | Servidor Oficial</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome para iconos -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -20,21 +20,16 @@
         .red-border {
             border-color: rgba(239, 68, 68, 0.3);
         }
-        .bg-corona {
-            background: linear-gradient(180deg, #180303 0%, #0b0202 100%);
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between bg-corona">
+<body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#180303] to-[#0b0202]">
 
     <!-- PANTALLA DE INICIO DE SESIÓN CON DISCORD -->
     <div id="login-screen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div class="max-w-md w-full bg-[#140606] border red-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(239,68,68,0.15)]">
-            <!-- Contenedor del Logo con la imagen de fondo integrada -->
-            <div class="mx-auto w-56 h-56 rounded-xl mb-6 shadow-lg border-2 border-red-600 overflow-hidden bg-cover bg-center" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg'), url('https://images.unsplash.com/photo-1548345680-f5475ea5df84?q=80&w=500');">
-                <!-- Fallback visual directo si el archivo local tarda en cargar en Vercel -->
-                <div class="w-full h-full bg-black/40 flex items-center justify-center text-xs text-red-500 font-bold uppercase tracking-wider">La Corona RP</div>
-            </div>
+            
+            <!-- Tu imagen cargando de forma local desde Vercel -->
+            <img src="./logo.jpg" alt="La Corona Roleplay" class="mx-auto w-56 h-56 object-cover rounded-xl mb-6 shadow-lg border-2 border-red-600">
             
             <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">LA CORONA <span class="text-red-500 red-glow">RP</span></h1>
             <p class="text-gray-400 text-sm mb-8">Inicia sesión con tu cuenta de Discord para verificar tu identidad y acceder al panel de estadísticas en tiempo real.</p>
@@ -46,20 +41,20 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL DE LA WEB (OCULTO POR DEFECTO) -->
+    <!-- CONTENIDO PRINCIPAL DE LA WEB (OCULTO POR DEFECTO HASTA QUE SE LOGEE) -->
     <div id="main-content" class="hidden flex-grow flex flex-col">
         <!-- Navbar -->
         <header class="bg-[#120505] border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-cover bg-center border border-red-600" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg');"></div>
+                <img src="./logo.jpg" alt="La Corona" class="w-10 h-10 rounded-lg object-cover border border-red-600">
                 <span class="text-white font-black tracking-widest text-lg">LA CORONA <span class="text-red-500">RP</span></span>
             </div>
             
-            <!-- Datos Reales del Perfil de Discord -->
+            <!-- Perfil de Discord conectado -->
             <div class="flex items-center gap-3 bg-[#1c0a0a] px-4 py-2 rounded-full border border-red-900/40">
                 <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-red-500">
                 <span id="user-name" class="text-white font-semibold text-sm">Cargando...</span>
-                <button onclick="logout()" class="text-gray-400 hover:text-red-500 text-xs ml-2 transition-colors" title="Cerrar Sesión">
+                <button onclick="logout()" class="text-gray-400 hover:text-red-500 text-xs ml-2 transition-colors">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
@@ -68,7 +63,7 @@
         <!-- Hero Section -->
         <section class="relative py-16 px-6 text-center border-b border-red-950/20">
             <div class="max-w-3xl mx-auto">
-                <div class="mx-auto w-44 h-44 rounded-2xl mb-6 shadow-2xl border-2 border-red-600 bg-cover bg-center" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg');"></div>
+                <img src="./logo.jpg" alt="La Corona" class="mx-auto w-44 h-44 object-cover rounded-2xl mb-6 shadow-2xl border-2 border-red-600">
                 <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¡Bienvenido al Bloque del <span class="text-red-500 red-glow">Mejor Rol</span>!</h2>
                 <p class="text-gray-300 text-base max-w-2xl mx-auto mb-8">Conéctate directamente al servidor con la comunidad activa más dura de MTA. Mapeos exclusivos, facciones reales y sistemas optimizados.</p>
                 
@@ -83,9 +78,9 @@
             </div>
         </section>
 
-        <!-- Monitoreo en Tiempo Real -->
+        <!-- Stats Grid -->
         <main class="max-w-6xl w-full mx-auto px-6 py-12 flex-grow grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Tarjeta Estado de Servidor Real -->
+            <!-- Jugadores Reales -->
             <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
                 <div>
                     <div class="flex items-center justify-between mb-4">
@@ -106,11 +101,11 @@
                 </div>
             </div>
 
-            <!-- Tarjeta IP Fija -->
+            <!-- IP Fija -->
             <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 flex flex-col justify-between shadow-lg">
                 <div>
                     <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs mb-4">Dirección IP de Conexión</h3>
-                    <p class="text-xl font-extrabold text-white tracking-wide mb-1 selection:bg-red-600">172.83.152.207</p>
+                    <p class="text-xl font-extrabold text-white tracking-wide mb-1">172.83.152.207</p>
                     <p class="text-sm text-red-400 font-medium">Puerto de Red: 2001</p>
                 </div>
                 <button onclick="copyIP()" class="mt-6 w-full bg-[#1c0a0a] hover:bg-red-950/30 text-gray-200 font-bold py-3 px-4 rounded-xl border border-red-900/30 transition-all text-xs flex items-center justify-center gap-2 uppercase tracking-wider">
@@ -118,7 +113,7 @@
                 </button>
             </div>
 
-            <!-- Características -->
+            <!-- Ventajas -->
             <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 shadow-lg">
                 <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs mb-4">Nuestras Ventajas</h3>
                 <ul class="space-y-3.5 text-sm text-gray-300">
@@ -133,15 +128,14 @@
 
     <!-- Footer -->
     <footer class="bg-[#080202] text-center py-6 border-t border-red-950/30 text-xs text-gray-500">
-        <p>&copy; 2026 La Corona Roleplay. Conexión Estable de Red Directa.</p>
+        <p>&copy; 2026 La Corona Roleplay. Todos los derechos reservados.</p>
     </footer>
 
     <script>
-        // ==========================================
-        // CONFIGURACIÓN DE DISCORD OAUTH2 REAL
-        // ==========================================
-        // !!! ADVERTENCIA !!! Cambia esto por tu Client ID real del portal de desarrolladores de Discord
-        const CLIENT_ID = '123456789012345678'; 
+        // =========================================================
+        // !!! REEMPLAZA ESTE ID POR EL APLICANTION ID DE DISCORD !!!
+        // =========================================================
+        const CLIENT_ID = '1517661392369483907'; 
         const REDIRECT_URI = 'https://la-corona-rp-com.vercel.app'; 
 
         function redirectToDiscord() {
@@ -194,12 +188,6 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            checkDiscordAuth();
-            fetchLiveServerPlayers();
-            setInterval(fetchLiveServerPlayers, 25000);
-        });
 
         function showLogin() {
             document.getElementById('main-content').classList.add('hidden');
@@ -269,6 +257,12 @@
                 alert("¡IP Copiada exitosamente!: " + fullIP);
             });
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth();
+            fetchLiveServerPlayers();
+            setInterval(fetchLiveServerPlayers, 25000);
+        });
     </script>
 </body>
 </html>
