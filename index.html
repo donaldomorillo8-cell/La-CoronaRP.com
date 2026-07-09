@@ -20,7 +20,6 @@
         .red-border {
             border-color: rgba(239, 68, 68, 0.3);
         }
-        /* Fondo con degrade simulando la estética del nuevo logo */
         .bg-corona {
             background: linear-gradient(180deg, #180303 0%, #0b0202 100%);
         }
@@ -31,8 +30,11 @@
     <!-- PANTALLA DE INICIO DE SESIÓN CON DISCORD -->
     <div id="login-screen" class="flex-grow flex flex-col items-center justify-center px-4 py-12">
         <div class="max-w-md w-full bg-[#140606] border red-border rounded-2xl p-8 text-center shadow-[0_0_40px_rgba(239,68,68,0.15)]">
-            <!-- Nuevo Logo Dominicano -->
-            <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona Roleplay Logo" class="mx-auto w-56 h-56 object-cover rounded-xl mb-6 shadow-lg border-2 border-red-600">
+            <!-- Contenedor del Logo con la imagen de fondo integrada -->
+            <div class="mx-auto w-56 h-56 rounded-xl mb-6 shadow-lg border-2 border-red-600 overflow-hidden bg-cover bg-center" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg'), url('https://images.unsplash.com/photo-1548345680-f5475ea5df84?q=80&w=500');">
+                <!-- Fallback visual directo si el archivo local tarda en cargar en Vercel -->
+                <div class="w-full h-full bg-black/40 flex items-center justify-center text-xs text-red-500 font-bold uppercase tracking-wider">La Corona RP</div>
+            </div>
             
             <h1 class="text-3xl font-black text-white mb-2 tracking-wide uppercase">LA CORONA <span class="text-red-500 red-glow">RP</span></h1>
             <p class="text-gray-400 text-sm mb-8">Inicia sesión con tu cuenta de Discord para verificar tu identidad y acceder al panel de estadísticas en tiempo real.</p>
@@ -49,7 +51,7 @@
         <!-- Navbar -->
         <header class="bg-[#120505] border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona Logo" class="w-10 h-10 rounded-lg object-cover border border-red-600">
+                <div class="w-10 h-10 rounded-lg bg-cover bg-center border border-red-600" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg');"></div>
                 <span class="text-white font-black tracking-widest text-lg">LA CORONA <span class="text-red-500">RP</span></span>
             </div>
             
@@ -66,7 +68,7 @@
         <!-- Hero Section -->
         <section class="relative py-16 px-6 text-center border-b border-red-950/20">
             <div class="max-w-3xl mx-auto">
-                <img src="https://i.imgur.com/eO66P6n.jpeg" alt="La Corona" class="mx-auto w-44 h-44 object-cover rounded-2xl mb-6 shadow-2xl border-2 border-red-600">
+                <div class="mx-auto w-44 h-44 rounded-2xl mb-6 shadow-2xl border-2 border-red-600 bg-cover bg-center" style="background-image: url('https://la-corona-rp-com.vercel.app/logo.jpg');"></div>
                 <h2 class="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¡Bienvenido al Bloque del <span class="text-red-500 red-glow">Mejor Rol</span>!</h2>
                 <p class="text-gray-300 text-base max-w-2xl mx-auto mb-8">Conéctate directamente al servidor con la comunidad activa más dura de MTA. Mapeos exclusivos, facciones reales y sistemas optimizados.</p>
                 
@@ -138,21 +140,20 @@
         // ==========================================
         // CONFIGURACIÓN DE DISCORD OAUTH2 REAL
         // ==========================================
-        const CLIENT_ID = 'TU_CLIENT_ID_DE_DISCORD_AQUI'; // <--- Pon aquí tu Client ID del portal de Discord
-        const REDIRECT_URI = window.location.href.split('#')[0]; 
+        // !!! ADVERTENCIA !!! Cambia esto por tu Client ID real del portal de desarrolladores de Discord
+        const CLIENT_ID = '123456789012345678'; 
+        const REDIRECT_URI = 'https://la-corona-rp-com.vercel.app'; 
 
         function redirectToDiscord() {
             const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=identify`;
             window.location.href = url;
         }
 
-        // Procesamiento del Token Real que devuelve Discord
         function checkDiscordAuth() {
             const fragment = new URLSearchParams(window.location.hash.slice(1));
             const accessToken = fragment.get('access_token');
 
             if (accessToken) {
-                // Limpiar la URL para estética
                 window.location.hash = '';
                 localStorage.setItem('dc_access_token', accessToken);
                 fetchDiscordUserData(accessToken);
@@ -194,6 +195,12 @@
             document.getElementById('main-content').classList.remove('hidden');
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            checkDiscordAuth();
+            fetchLiveServerPlayers();
+            setInterval(fetchLiveServerPlayers, 25000);
+        });
+
         function showLogin() {
             document.getElementById('main-content').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
@@ -211,27 +218,18 @@
             const ip = "172.83.152.207";
             const port = "2001";
             
-            // Usamos la API unificada de SA-MP/MTA de game-state externa
-            fetch(`https://api.game-state.com/v1/servers/${ip}:${port}`)
-                .then(response => {
-                    if (!response.ok) throw new Error();
-                    return response.json();
-                })
-                .then(data => {
-                    // Si el servidor responde correctamente con datos en vivo
-                    const online = data.players ? data.players : 0;
-                    const max = data.max_players ? data.max_players : 100;
-                    updateUIPlayers(online, max, true);
+            fetch(`https://api.samp-servers.net/v1/server/${ip}:${port}`)
+                .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+                .then(d => {
+                    updateUIPlayers(d.players || 0, d.maxPlayers || 150, true);
                 })
                 .catch(() => {
-                    // Fallback / Alternativa de consulta directa por si el rastreador de caché tarda en sincronizar
-                    fetch(`https://api.samp-servers.net/v1/server/${ip}:${port}`)
-                        .then(r => r.json())
-                        .then(d => {
-                            updateUIPlayers(d.players || 0, d.maxPlayers || 150, true);
+                    fetch(`https://api.game-state.com/v1/servers/${ip}:${port}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            updateUIPlayers(data.players || 0, data.max_players || 150, true);
                         })
                         .catch(() => {
-                            // En caso extremo de desconexión del host de la API, se muestra fuera de línea o 0 de forma limpia
                             updateUIPlayers(0, 150, false);
                         });
                 });
@@ -271,13 +269,6 @@
                 alert("¡IP Copiada exitosamente!: " + fullIP);
             });
         }
-
-        // Ejecución al iniciar
-        window.onload = function() {
-            checkDiscordAuth();
-            fetchLiveServerPlayers();
-            setInterval(fetchLiveServerPlayers, 20000); // Consulta real cada 20 segundos
-        };
     </script>
 </body>
 </html>
