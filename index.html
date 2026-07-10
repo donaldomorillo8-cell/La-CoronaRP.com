@@ -20,6 +20,19 @@
         .red-border {
             border-color: rgba(239, 68, 68, 0.2);
         }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #140606;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #450a0a;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #ef4444;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between bg-gradient-to-b from-[#180303] to-[#0b0202]">
@@ -60,18 +73,19 @@
         <section class="relative py-12 px-6 text-center border-b border-red-950/20">
             <div class="max-w-3xl mx-auto">
                 <img src="./logo.jpg" alt="La Corona" class="mx-auto w-40 h-40 object-cover rounded-2xl mb-6 shadow-2xl border-2 border-red-600">
-                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¿Por qué somos el mejor servidor de <span class="text-red-500 red-glow">MTA Dominicano</span> de Semi-Rol?</h2>
-                <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto mb-8">Porque aquí no vienes a aburrirte con reglas absurdas, combinamos el realismo de los mejores sistemas dominicanos con la acción urbana pura de nuestra calle. Mapeos duros de RD, trabajos locales y sistemas avanzados únicos.</p>
+                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¿Por qué somos el mejor servidor <span class="text-red-500 red-glow">Dominicano</span> de Semi-Rol?</h2>
+                <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto mb-8">Porque aquí no vienes a aburrirte con reglas absurdas, combinamos el realismo de los mejores sistemas dominicanos con la acción urbana pura de nuestra calle.</p>
                 
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <button onclick="copyIP()" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2">
-                        <i class="fas fa-copy"></i> COPIAR IP DE MTA
-                    </button>
+                    <!-- BOTÓN DIRECTO AL JUEGO -->
+                    <a href="samp://65.75.210.160:20019" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2 uppercase tracking-wider">
+                        <i class="fas fa-play text-xs animate-pulse"></i> Conectarse al Servidor
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- CONTADOR DE JUGADORES (MTA REAL-TIME) -->
+        <!-- CONTADOR DE JUGADORES -->
         <section class="max-w-6xl w-full mx-auto px-6 pt-8">
             <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-center md:text-left">
@@ -83,13 +97,13 @@
                         </span>
                     </div>
                     <p class="text-xl font-extrabold text-white tracking-wide">IP: 65.75.210.160 <span class="text-red-500">:20019</span></p>
-                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con el cliente MTA...</p>
+                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con las calles...</p>
                 </div>
                 
                 <div class="text-center min-w-[150px]">
                     <div class="flex items-baseline justify-center gap-2">
-                        <span id="player-count" class="text-5xl font-black text-white">...</span>
-                        <span id="player-max" class="text-gray-500 font-medium text-lg">/ ...</span>
+                        <span id="player-count" class="text-5xl font-black text-white">0</span>
+                        <span id="player-max" class="text-gray-500 font-medium text-lg">/ 100</span>
                     </div>
                     <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Jugadores Activos</p>
                 </div>
@@ -100,12 +114,42 @@
             </div>
         </section>
 
+        <!-- TABLA DINÁMICA DE JUGADORES CONECTADOS -->
+        <section class="max-w-6xl w-full mx-auto px-6 pt-8">
+            <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 shadow-lg">
+                <div class="flex justify-between items-center mb-4 border-b border-red-950/40 pb-3">
+                    <h3 class="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <i class="fas fa-users text-red-500"></i> Lista de Usuarios en el Bloque
+                    </h3>
+                    <span id="table-count-badge" class="bg-red-950/60 border border-red-800 text-red-400 text-xs font-bold px-2.5 py-1 rounded-md">0 Online</span>
+                </div>
+
+                <div class="overflow-y-auto max-h-64 custom-scrollbar">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-red-950/30 text-xs text-gray-500 uppercase tracking-wider">
+                                <th class="py-2 pl-4">ID / Estado</th>
+                                <th class="py-2">Nombre de Usuario</th>
+                                <th class="py-2 text-right pr-4">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-list-table">
+                            <tr>
+                                <td colspan="3" class="py-8 text-center text-sm text-gray-500">
+                                    <i class="fas fa-spinner animate-spin text-red-500 mr-2"></i> Cargando tabla de conexiones en tiempo real...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
         <!-- SECCIÓN DE CARACTERÍSTICAS EXCLUSIVAS -->
         <main class="max-w-6xl w-full mx-auto px-6 py-12">
             <h3 class="text-2xl font-black text-white uppercase tracking-wider mb-8 text-center md:text-left border-b border-red-950/30 pb-3">Sistemas e Instituciones Incluidas</h3>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- DIGESETT / AMET -->
+                <!-- Tarjeta 1 -->
                 <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
                     <img src="./amet.jpg" alt="AMET DIGESETT" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
@@ -116,8 +160,7 @@
                         <p class="text-gray-400 text-sm">Control de tránsito real en las avenidas. Multas por exceso de velocidad, fiscalización de luces y retención de vehículos mal estacionados.</p>
                     </div>
                 </div>
-
-                <!-- POLICÍA NACIONAL -->
+                <!-- Tarjeta 2 -->
                 <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
                     <img src="./policia.jpg" alt="Policía Nacional" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
@@ -128,8 +171,7 @@
                         <p class="text-gray-400 text-sm">Patrullaje constante en los barrios. Códigos de radio reales, arrestos, persecuciones de alto riesgo y sistema de antecedentes criminales.</p>
                     </div>
                 </div>
-
-                <!-- DEALER DE CARROS -->
+                <!-- Tarjeta 3 -->
                 <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
                     <img src="./dealer.jpg" alt="Dealer de Carros" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="p-6">
@@ -138,66 +180,6 @@
                             <h4 class="text-xl font-bold text-white uppercase">Dealer & Concesionarios</h4>
                         </div>
                         <p class="text-gray-400 text-sm">Compra tus vehículos directamente en los dealers locales. Guarda tus carros en garajes privados, modifícalos y págalos a plazos.</p>
-                    </div>
-                </div>
-
-                <!-- COCHES EXÓTICOS -->
-                <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
-                    <img src="./exotico.jpg" alt="Coches Exónicos" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas fa-tachometer-alt text-red-500 text-lg"></i>
-                            <h4 class="text-xl font-bold text-white uppercase">Coches Exóticos</h4>
-                        </div>
-                        <p class="text-gray-400 text-sm">Superdeportivos importados con físicas realistas y sonidos de motor modificados. Diseños únicos para destacar en el bloque.</p>
-                    </div>
-                </div>
-
-                <!-- GANGAS Y CAPOS -->
-                <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
-                    <img src="./ganga.jpg" alt="Gangas" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas fa-skull text-red-500 text-lg"></i>
-                            <h4 class="text-xl font-bold text-white uppercase">Gangas y Territorios</h4>
-                        </div>
-                        <p class="text-gray-400 text-sm">Controla los puntos de contrabando, monta tu coro con armas reales, defiende tu zona frente a bandas rivales y domina las calles.</p>
-                    </div>
-                </div>
-
-                <!-- STAFF ADMINISTRATIVO 24/7 -->
-                <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
-                    <img src="./staff.jpg" alt="Staff 24/7" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas fa-headset text-red-500 text-lg"></i>
-                            <h4 class="text-xl font-bold text-white uppercase">Staff Activo 24/7</h4>
-                        </div>
-                        <p class="text-gray-400 text-sm">Moderación seria sin abuso de poder. Reportes atendidos al instante en el juego o mediante canales automatizados en Discord.</p>
-                    </div>
-                </div>
-
-                <!-- TRABAJOS DOMINICANOS -->
-                <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
-                    <img src="./economia.jpg" alt="Economía Criolla" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas fa-coins text-red-500 text-lg"></i>
-                            <h4 class="text-xl font-bold text-white uppercase">Economía Criolla</h4>
-                        </div>
-                        <p class="text-gray-400 text-sm">Gana dinero de forma legal trabajando como Delivery, Conductor de Autobús, Camionero o Médico del sistema de emergencias.</p>
-                    </div>
-                </div>
-
-                <!-- SISTEMA DE MÚSICA URBANA -->
-                <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
-                    <img src="./bocina.jpg" alt="Bocinas Dominicanas" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
-                    <div class="p-6">
-                        <div class="flex items-center gap-3 mb-2">
-                            <i class="fas fa-volume-up text-red-500 text-lg"></i>
-                            <h4 class="text-xl font-bold text-white uppercase">Bocinas y Música</h4>
-                        </div>
-                        <p class="text-gray-400 text-sm">Coloca bocinas en las esquinas o configura el sonido de tu vehículo con radio por internet en tiempo real para armar el verdadero ambiente.</p>
                     </div>
                 </div>
             </div>
@@ -274,46 +256,46 @@
             showLogin();
         }
 
-        // ==========================================
-        // SISTEMA DE CONSULTA REAL NATIVA PARA MTA
-        // ==========================================
+        // ===============================================
+        // MOTOR DE CONSULTA CON PASARELA DE RESPALDO (ANTI-CORS)
+        // ===============================================
         function fetchLiveServerPlayers() {
             const ip = "65.75.210.160";
             const port = "20019";
             
-            // Usamos la API pública de Game-State adaptada a protocolos estructurados de MTA
-            fetch(`https://api.game-state.com/v1/servers/${ip}:${port}?t=${Date.now()}`)
+            // Usamos un proxy público de herokuapp/allorigins para saltar bloqueos de CORS del navegador si ocurren
+            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.gameserverping.com/v1/samp/' + ip + ':' + port)}&t=${Date.now()}`)
                 .then(res => {
                     if (!res.ok) throw new Error();
                     return res.json();
                 })
-                .then(data => {
-                    if (data && data.players !== undefined) {
+                .then(wrapper => {
+                    const data = JSON.parse(wrapper.contents);
+                    if (data && data.online !== undefined) {
                         updateUIPlayers(data.players, data.max_players || 100, true);
+                        renderPlayersList(data.players_list || data.players_names || []);
                     } else {
-                        fallbackMTAGet();
+                        updateUIPlayers(0, 100, false);
+                        renderPlayersList([]);
                     }
                 })
                 .catch(() => {
-                    fallbackMTAGet();
-                });
-        }
-
-        function fallbackMTAGet() {
-            const ip = "65.75.210.160";
-            const port = "20019";
-            // Segundo validador usando la pasarela directa de metadatos de juegos abiertos
-            fetch(`https://gameserverping.com/api/mta/${ip}/${port}`)
-                .then(r => r.json())
-                .then(d => {
-                    if(d && d.online !== undefined) {
-                        updateUIPlayers(d.players, d.max_players || 100, true);
-                    } else {
-                        updateUIPlayers(null, 100, false);
-                    }
-                })
-                .catch(() => {
-                    updateUIPlayers(null, 100, false);
+                    // Intento directo si el proxy falla
+                    fetch(`https://api.gameserverping.com/v1/samp/${ip}:${port}`)
+                        .then(r => r.json())
+                        .then(d => {
+                            if (d && d.online !== undefined) {
+                                updateUIPlayers(d.players, d.max_players || 100, true);
+                                renderPlayersList(d.players_list || d.players_names || []);
+                            } else {
+                                updateUIPlayers(0, 100, false);
+                                renderPlayersList([]);
+                            }
+                        })
+                        .catch(() => {
+                            updateUIPlayers(0, 100, false);
+                            renderPlayersList([]);
+                        });
                 });
         }
 
@@ -324,38 +306,71 @@
             const textEl = document.getElementById('server-status-text');
             const dot = document.getElementById('status-dot');
             const ping = document.getElementById('status-ping');
+            const badge = document.getElementById('table-count-badge');
 
-            if (isOnline && online !== null) {
+            if (isOnline) {
                 countEl.innerText = online;
                 maxEl.innerText = `/ ${max}`;
+                badge.innerText = `${online} Conectados`;
                 const pct = Math.min((online / max) * 100, 100);
                 barEl.style.width = pct + '%';
-                textEl.innerText = "Sincronizado con Multi Theft Auto en tiempo real.";
+                textEl.innerText = "Sincronizado con el servidor en tiempo real.";
                 textEl.className = "text-xs text-green-400 font-medium";
                 dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500";
                 ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
             } else {
-                countEl.innerText = "--";
+                countEl.innerText = "0";
                 maxEl.innerText = "/ 100";
-                barEl.style.width = '15%';
-                textEl.innerText = "Escaneando el puerto 20019...";
-                textEl.className = "text-xs text-yellow-500 font-medium";
-                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500";
-                ping.className = "absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-0";
+                badge.innerText = "Offline";
+                barEl.style.width = '0%';
+                textEl.innerText = "Servidor cerrado o cargando variables...";
+                textEl.className = "text-xs text-red-500 font-medium";
+                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
+                ping.className = "absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-0";
             }
         }
 
-        function copyIP() {
-            const fullIP = "65.75.210.160:20019";
-            navigator.clipboard.writeText(fullIP).then(() => {
-                alert("¡IP Copiada correctamente!: " + fullIP);
+        function renderPlayersList(list) {
+            const tbody = document.getElementById('players-list-table');
+            tbody.innerHTML = ''; 
+
+            if (!list || list.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="py-8 text-center text-sm text-gray-500 italic">
+                            No hay nadie en el bloque ahora mismo o la lista es privada. ¡Sé el primero en entrar!
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            list.forEach((player, index) => {
+                const name = typeof player === 'object' ? player.name : player;
+                const score = typeof player === 'object' && player.score !== undefined ? player.score : '1';
+                
+                const row = document.createElement('tr');
+                row.className = "border-b border-red-950/10 hover:bg-red-950/10 transition-colors text-sm text-gray-300";
+                row.innerHTML = `
+                    <td class="py-2.5 pl-4 font-mono text-xs text-red-500/80">
+                        <i class="fas fa-circle text-[8px] text-green-500 mr-2 animate-pulse"></i>ID: ${player.id || (index + 1)}
+                    </td>
+                    <td class="py-2.5 font-semibold text-white tracking-wide">${escapeHTML(name)}</td>
+                    <td class="py-2.5 text-right pr-4 font-mono font-bold text-gray-400">${score}</td>
+                `;
+                tbody.appendChild(row);
             });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
             fetchLiveServerPlayers();
-            setInterval(fetchLiveServerPlayers, 20000); // Actualiza la lista automáticamente cada 20 segundos
+            setInterval(fetchLiveServerPlayers, 15000); // Actualiza cada 15 segundos de forma dinámica
         });
     </script>
 </body>
