@@ -38,7 +38,7 @@
         </div>
     </div>
 
-    <!-- CONTENIDO PRINCIPAL DE LA WEB (Muestra todo tras logearse) -->
+    <!-- CONTENIDO PRINCIPAL DE LA WEB -->
     <div id="main-content" class="hidden flex-grow flex flex-col">
         <!-- Navbar -->
         <header class="bg-[#120505] border-b red-border sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
@@ -64,26 +64,26 @@
                 <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto mb-8">Porque aquí no vienes a aburrirte con reglas absurdas, combinamos el realismo de los mejores sistemas dominicanos con la acción urbana pura de nuestra calle. Mapeos duros de RD, trabajos locales y sistemas avanzados únicos.</p>
                 
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <a href="javascript:void(0)" onclick="copyIP()" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2">
-                        <i class="fas fa-copy"></i> COPIAR IP DEL SERVIDOR
-                    </a>
+                    <button onclick="copyIP()" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2">
+                        <i class="fas fa-copy"></i> COPIAR IP DE MTA
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- CONTADOR DE JUGADORES CIFRA REAL -->
+        <!-- CONTADOR DE JUGADORES (MTA REAL-TIME) -->
         <section class="max-w-6xl w-full mx-auto px-6 pt-8">
             <div class="bg-[#120505] border border-red-950/40 rounded-2xl p-6 shadow-lg flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="text-center md:text-left">
                     <div class="flex items-center justify-center md:justify-start gap-3 mb-2">
-                        <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs">Estado de Conexión</h3>
+                        <h3 class="text-gray-400 font-bold uppercase tracking-wider text-xs">Estado del Servidor</h3>
                         <span class="flex h-2.5 w-2.5 relative">
                             <span id="status-ping" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                             <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
                         </span>
                     </div>
-                    <p class="text-xl font-extrabold text-white tracking-wide">IP: 172.83.152.207 <span class="text-red-500">:2001</span></p>
-                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con el servidor...</p>
+                    <p class="text-xl font-extrabold text-white tracking-wide">IP: 65.75.210.160 <span class="text-red-500">:20019</span></p>
+                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con el cliente MTA...</p>
                 </div>
                 
                 <div class="text-center min-w-[150px]">
@@ -91,7 +91,7 @@
                         <span id="player-count" class="text-5xl font-black text-white">...</span>
                         <span id="player-max" class="text-gray-500 font-medium text-lg">/ ...</span>
                     </div>
-                    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Jugadores Reales</p>
+                    <p class="text-xs text-gray-400 uppercase tracking-widest mt-1">Jugadores Activos</p>
                 </div>
 
                 <div class="w-full md:w-1/3 bg-neutral-900 h-3 rounded-full overflow-hidden">
@@ -105,7 +105,6 @@
             <h3 class="text-2xl font-black text-white uppercase tracking-wider mb-8 text-center md:text-left border-b border-red-950/30 pb-3">Sistemas e Instituciones Incluidas</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                
                 <!-- DIGESETT / AMET -->
                 <div class="bg-[#120505] border border-red-950/40 rounded-2xl overflow-hidden shadow-xl group hover:border-red-600/40 transition-all">
                     <img src="./amet.jpg" alt="AMET DIGESETT" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300">
@@ -201,7 +200,6 @@
                         <p class="text-gray-400 text-sm">Coloca bocinas en las esquinas o configura el sonido de tu vehículo con radio por internet en tiempo real para armar el verdadero ambiente.</p>
                     </div>
                 </div>
-
             </div>
         </main>
     </div>
@@ -277,42 +275,45 @@
         }
 
         // ==========================================
-        // SISTEMA DE CONSULTA REAL DIRECTA (SAMP/MTA)
+        // SISTEMA DE CONSULTA REAL NATIVA PARA MTA
         // ==========================================
         function fetchLiveServerPlayers() {
-            const ip = "172.83.152.207";
-            const port = "2001";
+            const ip = "65.75.210.160";
+            const port = "20019";
             
-            // Usamos un query dinámico directo que rompe la caché de Vercel para traer datos 100% reales
-            fetch(`https://gameserverping.com/api/samp/${ip}/${port}?t=${Date.now()}`)
-                .then(res => res.json())
+            // Usamos la API pública de Game-State adaptada a protocolos estructurados de MTA
+            fetch(`https://api.game-state.com/v1/servers/${ip}:${port}?t=${Date.now()}`)
+                .then(res => {
+                    if (!res.ok) throw new Error();
+                    return res.json();
+                })
                 .then(data => {
-                    if (data && data.online !== undefined) {
-                        updateUIPlayers(data.players, data.max_players || 150, true);
+                    if (data && data.players !== undefined) {
+                        updateUIPlayers(data.players, data.max_players || 100, true);
                     } else {
-                        fallbackQuery();
+                        fallbackMTAGet();
                     }
                 })
                 .catch(() => {
-                    fallbackQuery();
+                    fallbackMTAGet();
                 });
         }
 
-        function fallbackQuery() {
-            const ip = "172.83.152.207";
-            const port = "2001";
-            // Segundo intento con servidor espejo en caso de caída
-            fetch(`https://api.game-state.com/v1/servers/${ip}:${port}`)
+        function fallbackMTAGet() {
+            const ip = "65.75.210.160";
+            const port = "20019";
+            // Segundo validador usando la pasarela directa de metadatos de juegos abiertos
+            fetch(`https://gameserverping.com/api/mta/${ip}/${port}`)
                 .then(r => r.json())
                 .then(d => {
-                    if(d && d.players !== undefined) {
-                        updateUIPlayers(d.players, d.max_players || 150, true);
+                    if(d && d.online !== undefined) {
+                        updateUIPlayers(d.players, d.max_players || 100, true);
                     } else {
-                        updateUIPlayers(null, 150, false);
+                        updateUIPlayers(null, 100, false);
                     }
                 })
                 .catch(() => {
-                    updateUIPlayers(null, 150, false);
+                    updateUIPlayers(null, 100, false);
                 });
         }
 
@@ -329,16 +330,15 @@
                 maxEl.innerText = `/ ${max}`;
                 const pct = Math.min((online / max) * 100, 100);
                 barEl.style.width = pct + '%';
-                textEl.innerText = "Datos reales actualizados en vivo.";
+                textEl.innerText = "Sincronizado con Multi Theft Auto en tiempo real.";
                 textEl.className = "text-xs text-green-400 font-medium";
                 dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500";
                 ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
             } else {
-                // Si la red está bloqueando temporalmente el script del navegador, mostramos carga en lugar de dejarlo en 0 limpio
                 countEl.innerText = "--";
-                maxEl.innerText = "/ 150";
-                barEl.style.width = '10%';
-                textEl.innerText = "Sincronizando con el puerto 2001...";
+                maxEl.innerText = "/ 100";
+                barEl.style.width = '15%';
+                textEl.innerText = "Escaneando el puerto 20019...";
                 textEl.className = "text-xs text-yellow-500 font-medium";
                 dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-yellow-500";
                 ping.className = "absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-0";
@@ -346,16 +346,16 @@
         }
 
         function copyIP() {
-            const fullIP = "172.83.152.207:2001";
+            const fullIP = "65.75.210.160:20019";
             navigator.clipboard.writeText(fullIP).then(() => {
-                alert("¡IP Copiada!: " + fullIP);
+                alert("¡IP Copiada correctamente!: " + fullIP);
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
             fetchLiveServerPlayers();
-            setInterval(fetchLiveServerPlayers, 15000); // Consulta real cada 15 segundos
+            setInterval(fetchLiveServerPlayers, 20000); // Actualiza la lista automáticamente cada 20 segundos
         });
     </script>
 </body>
