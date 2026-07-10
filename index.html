@@ -73,13 +73,13 @@
         <section class="relative py-12 px-6 text-center border-b border-red-950/20">
             <div class="max-w-3xl mx-auto">
                 <img src="./logo.jpg" alt="La Corona" class="mx-auto w-40 h-40 object-cover rounded-2xl mb-6 shadow-2xl border-2 border-red-600">
-                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¿Por qué somos el mejor servidor <span class="text-red-500 red-glow">Dominicano</span> de Semi-Rol?</h2>
+                <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">¿Por qué somos el mejor servidor <span class="text-red-500 red-glow">MTA Dominicano</span> de Semi-Rol?</h2>
                 <p class="text-gray-300 text-sm md:text-base max-w-2xl mx-auto mb-8">Porque aquí no vienes a aburrirte con reglas absurdas, combinamos el realismo de los mejores sistemas dominicanos con la acción urbana pura de nuestra calle.</p>
                 
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
-                    <!-- BOTÓN DIRECTO AL JUEGO -->
-                    <a href="samp://65.75.210.160:20019" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2 uppercase tracking-wider">
-                        <i class="fas fa-play text-xs animate-pulse"></i> Conectarse al Servidor
+                    <!-- BOTÓN DIRECTO A MTA -->
+                    <a href="mtasa://65.75.210.160:20019" class="bg-red-600 hover:bg-red-700 text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-600/20 transition-all transform hover:scale-[1.02] w-full sm:w-auto flex items-center justify-center gap-2 uppercase tracking-wider">
+                        <i class="fas fa-play text-xs animate-pulse"></i> Entrar al Servidor MTA
                     </a>
                 </div>
             </div>
@@ -97,7 +97,7 @@
                         </span>
                     </div>
                     <p class="text-xl font-extrabold text-white tracking-wide">IP: 65.75.210.160 <span class="text-red-500">:20019</span></p>
-                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con las calles...</p>
+                    <p id="server-status-text" class="text-xs text-green-400 mt-1">Conectando en vivo con el cliente MTA...</p>
                 </div>
                 
                 <div class="text-center min-w-[150px]">
@@ -130,7 +130,7 @@
                             <tr class="border-b border-red-950/30 text-xs text-gray-500 uppercase tracking-wider">
                                 <th class="py-2 pl-4">ID / Estado</th>
                                 <th class="py-2">Nombre de Usuario</th>
-                                <th class="py-2 text-right pr-4">Score</th>
+                                <th class="py-2 text-right pr-4">Ping</th>
                             </tr>
                         </thead>
                         <tbody id="players-list-table">
@@ -257,14 +257,14 @@
         }
 
         // ===============================================
-        // MOTOR DE CONSULTA CON PASARELA DE RESPALDO (ANTI-CORS)
+        // MOTOR DE CONSULTA EXCLUSIVO PARA MTA
         // ===============================================
         function fetchLiveServerPlayers() {
             const ip = "65.75.210.160";
             const port = "20019";
             
-            // Usamos un proxy público de herokuapp/allorigins para saltar bloqueos de CORS del navegador si ocurren
-            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.gameserverping.com/v1/samp/' + ip + ':' + port)}&t=${Date.now()}`)
+            // Usando el proxy AllOrigins para bypass de CORS, apuntando a la API de MTA
+            fetch(`https://api.allorigins.win/get?url=${encodeURIComponent('https://api.gameserverping.com/v1/mta/' + ip + '/' + port)}&t=${Date.now()}`)
                 .then(res => {
                     if (!res.ok) throw new Error();
                     return res.json();
@@ -280,13 +280,13 @@
                     }
                 })
                 .catch(() => {
-                    // Intento directo si el proxy falla
-                    fetch(`https://api.gameserverping.com/v1/samp/${ip}:${port}`)
+                    // Intento alternativo directo a endpoint general si falla el proxy
+                    fetch(`https://api.game-state.com/v1/servers/${ip}:${port}`)
                         .then(r => r.json())
                         .then(d => {
-                            if (d && d.online !== undefined) {
+                            if (d && d.players !== undefined) {
                                 updateUIPlayers(d.players, d.max_players || 100, true);
-                                renderPlayersList(d.players_list || d.players_names || []);
+                                renderPlayersList(d.players_list || []);
                             } else {
                                 updateUIPlayers(0, 100, false);
                                 renderPlayersList([]);
@@ -314,7 +314,7 @@
                 badge.innerText = `${online} Conectados`;
                 const pct = Math.min((online / max) * 100, 100);
                 barEl.style.width = pct + '%';
-                textEl.innerText = "Sincronizado con el servidor en tiempo real.";
+                textEl.innerText = "Sincronizado con Multi Theft Auto en tiempo real.";
                 textEl.className = "text-xs text-green-400 font-medium";
                 dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500";
                 ping.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75";
@@ -323,7 +323,7 @@
                 maxEl.innerText = "/ 100";
                 badge.innerText = "Offline";
                 barEl.style.width = '0%';
-                textEl.innerText = "Servidor cerrado o cargando variables...";
+                textEl.innerText = "Buscando respuesta del servidor MTA...";
                 textEl.className = "text-xs text-red-500 font-medium";
                 dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
                 ping.className = "absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-0";
@@ -338,7 +338,7 @@
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="3" class="py-8 text-center text-sm text-gray-500 italic">
-                            No hay nadie en el bloque ahora mismo o la lista es privada. ¡Sé el primero en entrar!
+                            No hay nadie en el bloque ahora mismo. ¡Sé el primero en entrar!
                         </td>
                     </tr>`;
                 return;
@@ -346,7 +346,7 @@
 
             list.forEach((player, index) => {
                 const name = typeof player === 'object' ? player.name : player;
-                const score = typeof player === 'object' && player.score !== undefined ? player.score : '1';
+                const pingVal = typeof player === 'object' && player.ping !== undefined ? player.ping + ' ms' : '--';
                 
                 const row = document.createElement('tr');
                 row.className = "border-b border-red-950/10 hover:bg-red-950/10 transition-colors text-sm text-gray-300";
@@ -355,7 +355,7 @@
                         <i class="fas fa-circle text-[8px] text-green-500 mr-2 animate-pulse"></i>ID: ${player.id || (index + 1)}
                     </td>
                     <td class="py-2.5 font-semibold text-white tracking-wide">${escapeHTML(name)}</td>
-                    <td class="py-2.5 text-right pr-4 font-mono font-bold text-gray-400">${score}</td>
+                    <td class="py-2.5 text-right pr-4 font-mono font-bold text-gray-400">${pingVal}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -370,7 +370,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkDiscordAuth();
             fetchLiveServerPlayers();
-            setInterval(fetchLiveServerPlayers, 15000); // Actualiza cada 15 segundos de forma dinámica
+            setInterval(fetchLiveServerPlayers, 15000); // Sincroniza cada 15 segundos
         });
     </script>
 </body>
